@@ -1,0 +1,31 @@
+image: duclinhclc/flutter-image:latest
+
+pipelines:
+  default:
+      - step:
+          caches:
+            - gradle
+            - gradlewrapper
+            - flutter
+          deployment: test
+          script:
+            - echo "Show the configuration"
+            - flutter upgrade
+            - flutter pub get
+            - flutter doctor -v
+            - echo "Running flutter analyze with linting rules"
+            - echo "Only on pull request"
+            - echo "Building release APK..."
+            - flutter -v build apk
+            - SLACK_TOKEN=xoxb-3379226458694-3398666726068-3bLQ0qMnKD7pmBaCeLCxExZi
+            - SLACK_CHANEL=ips_android
+            - BRANCH_SLUG="   ${BITBUCKET_BRANCH//\//-}"
+            - FILE_NAME="$BITBUCKET_REPO_SLUG$BRANCH_SLUG.apk"
+            - cp build/app/outputs/apk/release/app-release.apk "build/app/outputs/apk/release/$FILE_NAME"
+            - curl -F file=@"build/app/outputs/apk/release/$FILE_NAME" -F channels=${SLACK_CHANEL} -F token=${SLACK_TOKEN} https://slack.com/api/files.upload
+          artifacts:
+            - build/app/outputs/apk/release/**
+definitions:
+  caches:
+    gradlewrapper: ~/.gradle/wrapper
+    flutter: /opt/flutter
