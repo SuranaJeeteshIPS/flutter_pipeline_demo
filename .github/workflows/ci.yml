@@ -34,7 +34,7 @@ jobs:
 #       - run: flutter build ios --release --no-codesign
 
   build_appbundle:
-    name: Build Flutter (Android)
+    name: Build Only Flutter (Android)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
